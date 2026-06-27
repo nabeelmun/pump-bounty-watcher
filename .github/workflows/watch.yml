@@ -1,0 +1,42 @@
+name: pump bounty watch
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bounty-watch
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check for new bounties
+        run: node watcher.mjs --check-once
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+
+      - name: Remember what we've seen
+        run: |
+          if [ -n "$(git status --porcelain seen.json)" ]; then
+            git config user.name "bounty-bot"
+            git config user.email "bounty-bot@users.noreply.github.com"
+            git add seen.json
+            git commit -m "update seen bounties"
+            git push
+          else
+            echo "No change to seen.json."
+          fi
