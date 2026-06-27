@@ -1,0 +1,7 @@
+node_modules/
+run.log
+err.log
+package-lock.json
+browser-profile/
+# NOTE: seen.json is intentionally NOT ignored - the GitHub Action commits it
+# back so it remembers which bounties it already alerted you about.
