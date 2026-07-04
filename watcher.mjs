@@ -131,9 +131,20 @@ async function main() {
     return;
   }
 
-  // single run (used by GitHub Actions, which runs us on a schedule)
+  // scheduled run (used by GitHub Actions). By default it checks once and exits.
+  // If config.runForSeconds > 0, it keeps checking every pollSeconds for that long
+  // before exiting - this lets a 5-minute GitHub timer give ~30s freshness by
+  // staying alive between fires.
   if (process.argv.includes("--check-once")) {
-    await processCycle();
+    const runForMs = Number(CONFIG.runForSeconds || 0) * 1000;
+    const end = Date.now() + runForMs;
+    while (true) {
+      try { await processCycle(); }
+      catch (e) { log("Cycle error:", e.message); }
+      const remaining = end - Date.now();
+      if (remaining <= 0) break;
+      await new Promise(r => setTimeout(r, Math.min(CONFIG.pollSeconds * 1000, remaining)));
+    }
     return;
   }
 
