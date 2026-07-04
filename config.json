@@ -2,6 +2,7 @@
   "ntfyServer": "https://ntfy.sh",
   "ntfyTopic": "",
   "pollSeconds": 45,
+  "runForSeconds": 20400,
   "apiUrl": "https://livestream-api.pump.fun/bounties/v2/tasks?sort=createdAt&order=desc&limit=40",
   "bountyLinkBase": "https://pump.fun/go/bounties/",
   "minRewardUsd": 0
